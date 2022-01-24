@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		teste jogo tank
+	</title>
+	<style>
+
+		.testetop,
+		.teste,
+		.testebot{
+			width: 203px;
+			height: 45px;
+			position: absolute;
+		}
+		.testetop{
+			left: 285px;
+			top: 170px;
+		}
+		.teste{
+			left: 317px;
+			top: 232px;
+		}
+		.testebot{
+			left: 285px;
+			top: 285px;
+		}
+		.link1, .link2, .link3{
+			width: 203px;
+			height: 26px;
+			position: absolute;
+			background-color: #bcbcbc;
+			z-index: -1;
+			text-align: center;
+			padding-top: 7px;
+		}
+		.link1{
+			left: 255px;
+			top: 157px;
+		}
+		.link2{
+			left: 281px;
+			top: 220px;
+		}
+		.link3{
+			left: 256px;
+			top: 275px;
+		}
+		#canveefundo{
+			z-index: -2
+		}
+
+
+
+	</style>
+</head>
+<body>
+		<!-- imagem de fundo -->
+		<canvas id="canveefundo" width="960" height="600" style="position: absolute; left: 0px; top: 0px"></canvas>
+		<!-- engrenagem girando -->
+		<canvas id="canveecog" width="960" height="600" style="position: absolute; left: 0px; top: 0px"></canvas>
+		<!-- relogio sem ponteiros -->
+		<canvas id="canveemenu" width="960" height="600" style="position: absolute; left: 0px; top: 0px"></canvas>
+		<!-- área onde os ponteiros deveriam aparecer -->
+		<canvas id="canvas" width="300" height="300" style="position: absolute; left: -74px; top: 113px"></canvas>
+
+		<p class="link1"><a href="#1">Primeiro Link</a></p>
+		<p class="link2"><a href="#2">Segundo Link</a></p>
+		<p class="link3"><a href="#3">Terceiro Link</a></p>
+		
+		<!-- dois elementos só para ver a contagem dos milissegundos pelo inspecionar do google chrome -->
+
+		<!-- contador invisivel -->
+		<p id="contador" style="display: none"></p>
+
+		<!-- contador invisivel -->
+		<p id="contador2" style="display: none"></p> 
+
+		<!-- esses 3 itens estão a direita do relógio -->
+		<!-- objetos feitos somente para identificar o mouseover/mouseout -->
+		<!-- pistão de cima -->
+		<a href="#1">
+			<div class="testetop" onmouseover="checkintop();" onmouseout="checkouttop();"></div>
+		</a>
+		<!-- pistao do meio -->
+		<a href="#2">
+			<div class="teste" onmouseover="checkin();" onmouseout="checkout();"></div>
+		</a>
+		<!-- pistão de baixo -->
+		<a href="#3">
+			<div class="testebot" onmouseover="checkinbot();" onmouseout="checkoutbot();"></div>
+		</a>
+
+
+		
+		<audio id="som"  style="display: none"></audio>
+		<audio id="sfx"  style="display: none"></audio>
+
+		<script>
+
+			var canvasfundo = document.getElementById("canveefundo");
+			var contextfundo = canvasfundo.getContext('2d');
+
+			var canvascog = document.getElementById("canveecog");
+			var contextcog = canvascog.getContext('2d');
+
+			var canvasmenu = document.getElementById("canveemenu");
+			var contextmenu = canvasmenu.getContext('2d');
+
+	
+ 			
+			var coisa = 27;
+
+
+			var eex1 = 0;
+			var framming1 = 0;
+			var frame1 = 0;
+			var xframe1 = 0;
+			var xpos1 = 0;
+			var xpos11 = 0;
+			var hover1 = "0";
+
+			var eex2 = 0;
+			var framming2 = 0;
+			var frame2 = 0;
+			var xframe2 = 0;
+			var xpos2 = 0;
+			var xpos22 = 0;
+			var hover2 = "0";
+
+			var eex3 = 0;
+			var framming3 = 0;
+			var frame3 = 0;
+			var xframe3 = 0;
+			var xpos3 = 0;
+			var xpos33 = 0;
+			var hover3 = "0";
+
+
+			
+			anterior = new Date().getTime();
+			requestAnimationFrame(Desenhar);
+			requestAnimationFrame(Menu);
+
+			//CÓDIGOS DO AUDIO
+
+			var audio = document.getElementById("som");
+			audio.src = "bg.mp3";
+			audio.play();
+			audio.loop = true;
+
+			var audiosfx = document.getElementById("sfx");
+			audiosfx.src = "open.mp3";
+			
+
+
+			// essa função fica em loop eterno e chama todas as outras funções que vão desenhar
+			 
+			function Desenhar() {
+			 	agora = new Date().getTime();
+			 	decorrido = agora - anterior;
+			 	Fundo();
+			 	Cog();
+			 	Menu();
+			 	Barra();
+			 	Barramid();
+			 	Barrabot();
+				anterior = agora;
+				requestAnimationFrame(Desenhar);
+
+			}
+			function Fundo(){
+			 	var fundo = new Image();
+			 	fundo.src = 'background2.jpg';
+			 	fundo.onload = function(){
+			 		contextfundo.drawImage(fundo, 0,0,960,600);
+			 	}
+			}
+			function Cog(){
+			 	var cog = new Image();
+			 	cog.src = 'coggy.png';
+			 	cog.onload = function(){
+					if (coisa<27) {
+						coisa++;
+					}else{
+						coisa=0;
+						contextcog.clearRect(0,0, cog.width, cog.height);
+						contextcog.translate(140, 110);
+						contextcog.rotate((10 * Math.PI) / 180);
+						contextcog.translate(-140, -110);
+						contextcog.drawImage(cog,65,35,150,150);
+					}
+			 	}
+			}
+			function Menu(){
+			 	var menu = new Image();
+			 	menu.src = 'clock.png';
+			 	menu.onload = function(){	
+					contextmenu.clearRect(0,0, 2500, 2500);
+			 		contextmenu.drawImage(menu,-150,0,500,450);
+			 	}
+			}
+			function Barra(){
+				var bar1 = new Image();
+				bar1.src = 'menubar.png';
+				bar1.onload = function () {
+					//checagem primeira barra
+					if (hover1=="1") {
+						if (framming1<2) {
+							xpos11+=1;
+							framming1 += 1;
+						}else if(frame1<29){
+							framming1 = 0;
+							frame1 += 1;
+						}else{
+							frame1=29;
+						}
+					}
+					if(hover1=="0"){
+						if (framming1<2) {
+							xpos11-=1;
+							framming1 += 1;
+						}else if(frame1>0){
+							framming1 = 0;
+							frame1 -= 1;
+						}else{
+							frame1=0;
+						}
+						if (xpos11<1 || frame1 == 0) {
+							xpos11=0;
+						}
+
+					}
+					xpos = xpos11*2;
+					xframe = 351.65*frame1;
+					
+					contextmenu.drawImage(bar1,10+xframe,100,350,87,283+xpos,170,210,45);
+				}
+			}
+			
+			function Barramid(){
+				var bar2 = new Image();
+				bar2.src = 'menubar.png';
+				bar2.onload = function(){
+					//checagem segunda barra
+					if (hover2=="1") {
+						if (framming2<2) {
+							xpos22+=1;
+							framming2 += 1;
+						}else if(frame2<29){
+							framming2 = 0;
+							frame2 += 1;
+						}else{
+							frame2=29;
+						}
+					}
+					if(hover2=="0"){
+						if (framming2<2) {
+							xpos22-=1;
+							framming2 += 1;
+						}else if(frame2>0){
+							framming2 = 0;
+							frame2 -= 1;
+						}else{
+							frame2=0;
+						}
+						if (xpos22<1 || frame2 == 0) {
+							xpos22=0;
+						}
+					}
+					xpos2 = xpos22*2;
+					xframe2 = 351.65*frame2;
+
+					contextmenu.drawImage (bar2,10+xframe2,100,350,87,315+xpos2,232,210,45);
+				}
+			}
+			function Barrabot(){
+				var bar3 = new Image();
+				bar3.src = 'menubar.png';
+				bar3.onload = function(){
+					//checagem segunda barra
+					if (hover3=="1") {
+						if (framming3<2) {
+							xpos33+=1;
+							framming3 += 1;
+						}else if(frame3<29){
+							framming3 = 0;
+							frame3 += 1;
+						}else{
+							frame3=29;
+						}
+					}
+					if(hover3=="0"){
+						if (framming3<2) {
+							xpos33-=1;
+							framming3 += 1;
+						}else if(frame3>0){
+							framming3 = 0;
+							frame3 -= 1;
+						}else{
+							frame3=0;
+						}
+						if (xpos33<1 || frame3 == 0) {
+							xpos33=0;
+						}
+					}
+					xpos3 = xpos33*2;
+					xframe3 = 351.65*frame3;
+
+					contextmenu.drawImage (bar3,10+xframe3,100,350,87,282+xpos3,286,210,45);
+				}
+			}
+			//funções para mover os pistões em conjunto do mousehover
+			// variavel = 1  <- mouse está em cima
+			// variavel = 0 <- mouse saiu de cima
+			function checkintop(){
+				hover1 = "1";
+				audiosfx.pause();
+				audiosfx.currentTime = 0;
+				audiosfx.play();
+			}
+
+			function checkouttop(){
+				hover1 = "0";
+			}
+
+			function checkin(){
+				hover2 = "1";
+				audiosfx.pause();
+				audiosfx.currentTime = 0;
+				audiosfx.play();
+			}
+
+			function checkout(){
+				hover2 = "0";
+			}
+
+			function checkinbot(){
+				hover3 = "1";
+				audiosfx.pause();
+				audiosfx.currentTime = 0;
+				audiosfx.play();
+			}
+
+			function checkoutbot(){
+				hover3 = "0";
+			}			
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var radius = canvas.height / 2;
+ctx.translate(radius, radius);
+radius = radius * 0.90
+setInterval(drawClock, 1000);
+function drawClock() {
+  drawTime(ctx, radius);
+}
+function drawTime(ctx, radius){
+    var now = new Date();
+    var hora = now.getHours();
+    var min = now.getMinutes();
+    var seg = now.getSeconds();
+
+	ctx.clearRect(0,0,1200,1200);
+    //hora
+    hora=hora%12;
+    hora=(hora*Math.PI/6)+
+    (min*Math.PI/(6*60))+
+    (seg*Math.PI/(360*60));
+	ctx.clearRect(-600,-600,1200,1200);
+    drawHand(ctx, hora, radius*0.5, radius*0.07);
+    //min
+    min=(min*Math.PI/30)+(seg*Math.PI/(30*60));
+    drawHand(ctx, min, radius*0.8, radius*0.07);
+    // seg
+    seg=(seg*Math.PI/30);
+    drawHand(ctx, seg, radius*0.9, radius*0.02);
+
+
+}
+
+function drawHand(ctx, pos, length, width) {
+	
+    ctx.beginPath();
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";ctx.strokeStyle="black";
+
+    ctx.moveTo(0,0);
+
+    ctx.rotate(pos);
+
+    ctx.lineTo(0, -length);
+    ctx.stroke();
+
+    ctx.rotate(-pos);
+
+
+}
+		</script>
+</body>
+</html>
